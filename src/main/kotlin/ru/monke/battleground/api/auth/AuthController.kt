@@ -1,4 +1,4 @@
-package ru.monke.battleground.api
+package ru.monke.battleground.api.auth
 
 import io.ktor.http.*
 import io.ktor.server.request.*

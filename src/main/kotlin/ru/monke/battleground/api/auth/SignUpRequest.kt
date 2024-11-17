@@ -1,4 +1,4 @@
-package ru.monke.battleground.api
+package ru.monke.battleground.api.auth
 
 import kotlinx.serialization.Serializable
 

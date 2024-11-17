@@ -1,11 +1,9 @@
 package ru.monke.battleground.data
 
-import example.com.CityService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.monke.battleground.domain.auth.model.Account
 import java.sql.Connection
-import java.sql.Statement
 
 class AccountDatastore(
     private val connection: Connection
