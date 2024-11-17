@@ -30,7 +30,21 @@ fun Route.matchmakingController() {
                     call.respond(HttpStatusCode.OK, ConnectView(code))
                 }
             }
-        }
+            route("/connect/{team_code}") {
+                post {
+                    val principal = call.principal<JWTPrincipal>()
+                        ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
 
+                    val string = principal.payload.claims["account_id"].toString()
+                    val accountId = string.substring(1, string.length - 1)
+                    val teamCode = call.parameters["team_code"] ?: ""
+
+                    interactor.connectToTeam(accountId, teamCode)
+                        .onSuccess { call.respond(HttpStatusCode.OK) }
+                        .onFailure { call.respond(HttpStatusCode(500, it.toString())) }
+                }
+            }
+        }
     }
+
 }

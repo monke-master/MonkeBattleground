@@ -5,5 +5,6 @@ data class Team(
     val invitationCode: String,
     val session: Session? = null,
     val players: List<Player>,
-    val isReady: Boolean = false
+    val isReady: Boolean = false,
+    val teamSize: TeamSize
 )

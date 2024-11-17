@@ -24,7 +24,8 @@ class MatchmakingInteractor(
         val team = Team(
             id = teamId,
             invitationCode = code,
-            players = listOf(player)
+            players = listOf(player),
+            teamSize = teamSize
         )
 
         matchmakingRepository.insertTeam(team)
@@ -36,6 +37,10 @@ class MatchmakingInteractor(
         teamCode: String
     ): Result<Any> {
         val team = matchmakingRepository.getTeamByCode(teamCode) ?: return Result.failure(TeamNotFoundException())
+
+        if (team.players.size == team.teamSize.size) {
+            return Result.failure(FullTeamException())
+        }
 
         val player = Player(
             accountId = accountId,
