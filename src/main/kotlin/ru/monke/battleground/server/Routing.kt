@@ -1,4 +1,4 @@
-package ru.monke.battleground
+package ru.monke.battleground.server
 
 import io.ktor.server.application.*
 import io.ktor.server.response.*

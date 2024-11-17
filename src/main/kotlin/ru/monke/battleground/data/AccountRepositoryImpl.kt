@@ -1,6 +1,7 @@
 package ru.monke.battleground.data
 
 import ru.monke.battleground.domain.auth.Account
+import ru.monke.battleground.domain.auth.AccountNotFoundException
 import ru.monke.battleground.domain.auth.AccountRepository
 
 class AccountRepositoryImpl: AccountRepository {
@@ -15,7 +16,7 @@ class AccountRepositoryImpl: AccountRepository {
 
     override suspend fun getAccountByEmail(email: String): Result<Account> {
         return runCatching {
-            accounts.find { it.email == email }!!
+            accounts.find { it.email == email } ?: throw AccountNotFoundException()
         }
     }
 
