@@ -5,10 +5,10 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.mp.KoinPlatform
-import ru.monke.battleground.domain.auth.AccountNotFoundException
-import ru.monke.battleground.domain.auth.SignInUseCase
-import ru.monke.battleground.domain.auth.SignUpUseCase
-import ru.monke.battleground.domain.auth.WrongPasswordException
+import ru.monke.battleground.domain.auth.error.AccountNotFoundException
+import ru.monke.battleground.domain.auth.usecase.SignInUseCase
+import ru.monke.battleground.domain.auth.usecase.SignUpUseCase
+import ru.monke.battleground.domain.auth.error.WrongPasswordException
 import ru.monke.battleground.server.generateJWT
 import ru.monke.battleground.view.SignInView
 import ru.monke.battleground.view.SignUpView

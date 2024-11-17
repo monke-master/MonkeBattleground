@@ -1,4 +1,4 @@
-package ru.monke.battleground.domain.auth
+package ru.monke.battleground.domain.auth.model
 
 data class Account(
     val id: String,

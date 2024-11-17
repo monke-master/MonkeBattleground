@@ -1,5 +1,7 @@
-package ru.monke.battleground.domain.auth
+package ru.monke.battleground.domain.auth.usecase
 
+import ru.monke.battleground.domain.auth.AccountRepository
+import ru.monke.battleground.domain.auth.model.Account
 import java.util.UUID
 
 class SignUpUseCase(

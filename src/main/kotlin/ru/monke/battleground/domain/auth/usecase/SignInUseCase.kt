@@ -1,4 +1,8 @@
-package ru.monke.battleground.domain.auth
+package ru.monke.battleground.domain.auth.usecase
+
+import ru.monke.battleground.domain.auth.AccountRepository
+import ru.monke.battleground.domain.auth.error.WrongPasswordException
+import ru.monke.battleground.domain.auth.model.Account
 
 class SignInUseCase(
     private val accountRepository: AccountRepository
