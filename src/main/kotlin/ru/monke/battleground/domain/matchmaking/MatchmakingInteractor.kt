@@ -4,6 +4,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import ru.monke.battleground.domain.auth.AccountRepository
+import ru.monke.battleground.domain.auth.error.AccountNotFoundException
+import ru.monke.battleground.domain.auth.model.Account
+import ru.monke.battleground.domain.game.GameInteractor
+import ru.monke.battleground.domain.game.GameRepository
+import ru.monke.battleground.domain.game.INVENTORY_SIZE
+import ru.monke.battleground.domain.game.MAX_HEALTH
+import ru.monke.battleground.domain.game.models.*
 import ru.monke.battleground.domain.matchmaking.error.FullTeamException
 import ru.monke.battleground.domain.matchmaking.error.TeamNotFoundException
 import ru.monke.battleground.domain.matchmaking.model.*
@@ -12,7 +20,9 @@ import java.util.*
 
 class MatchmakingInteractor(
     private val teamRepository: TeamRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val gameInteractor: GameInteractor,
+    private val accountRepository: AccountRepository
 ) {
 
     private val startingSessions = mutableListOf<String>()
@@ -21,6 +31,7 @@ class MatchmakingInteractor(
         accountId: String,
         teamSize: TeamSize
     ): String {
+        val account = accountRepository.getAccountById(accountId).getOrNull() ?: throw AccountNotFoundException()
         val code = generateSixSymbolCode().capitalize()
         if (teamRepository.getTeamByCode(code) != null) {
             return connect(accountId, teamSize)
@@ -28,7 +39,7 @@ class MatchmakingInteractor(
 
         val teamId = UUID.randomUUID().toString()
         val player = Player(
-            accountId = accountId,
+            account = account,
             teamId = teamId,
             id = UUID.randomUUID().toString()
         )
@@ -48,13 +59,14 @@ class MatchmakingInteractor(
         teamCode: String
     ): Result<Any> {
         val team = teamRepository.getTeamByCode(teamCode) ?: return Result.failure(TeamNotFoundException())
+        val account = accountRepository.getAccountById(accountId).getOrNull() ?: return Result.failure(AccountNotFoundException())
 
         if (team.players.size == team.teamSize.size) {
             return Result.failure(FullTeamException())
         }
 
         val player = Player(
-            accountId = accountId,
+            account = account,
             teamId = team.id,
             id = UUID.randomUUID().toString()
         )
@@ -76,7 +88,7 @@ class MatchmakingInteractor(
 
         var appropriateSession = sessions
             .filter {
-                it.sessionStatus == SessionStatus.WAITING_FOR_PLAYERS &&
+                it.sessionStatus == SessionStatus.WaitingForPlayers &&
                 it.teams.size + 1 <= MAX_PLAYERS / it.teamSize.size
             }
             .maxByOrNull { it.teams.size }
@@ -96,10 +108,10 @@ class MatchmakingInteractor(
     }
 
     private suspend fun createSession(team: Team): Session {
-        val session =  Session(
+        val session = Session(
             id = UUID.randomUUID().toString(),
             teamSize = team.teamSize,
-            sessionStatus = SessionStatus.WAITING_FOR_PLAYERS,
+            sessionStatus = SessionStatus.WaitingForPlayers,
             teams = emptyList()
         )
         sessionRepository.insertSession(session)
@@ -112,12 +124,14 @@ class MatchmakingInteractor(
 
         CoroutineScope(currentCoroutineContext()).launch {
             delay(MILLIS_TO_START_SESSION)
-            sessionRepository.insertSession(session.copy(sessionStatus = SessionStatus.STARTED))
+            val gameId = gameInteractor.createGame(session)
+            sessionRepository.insertSession(session.copy(sessionStatus = SessionStatus.Started(gameId)))
         }
     }
 
-    suspend fun getSession(id: String) = sessionRepository.sessions[id]
+    fun getSession(id: String) = sessionRepository.sessions[id]
 }
+
 
 private fun generateSixSymbolCode(): String {
     val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"

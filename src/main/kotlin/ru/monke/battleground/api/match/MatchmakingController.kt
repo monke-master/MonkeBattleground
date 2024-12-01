@@ -16,10 +16,12 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.koin.mp.KoinPlatform
+import ru.monke.battleground.api.game.SessionStatusView
 import ru.monke.battleground.domain.auth.usecase.ValidateAccountUseCase
 import ru.monke.battleground.domain.matchmaking.MatchmakingInteractor
 import ru.monke.battleground.server.getAccountId
 import ru.monke.battleground.view.ConnectView
+import ru.monke.battleground.view.SessionStatusView
 import ru.monke.battleground.view.SessionView
 import ru.monke.battleground.view.TeamReadyView
 
@@ -27,7 +29,6 @@ private const val TEAM_CODE = "team_code"
 private const val SESSION_ID = "session_id"
 
 fun Route.matchmakingController() {
-
     val interactor: MatchmakingInteractor = KoinPlatform.getKoin().get()
     val validateAccountUseCase: ValidateAccountUseCase = KoinPlatform.getKoin().get()
 
@@ -102,7 +103,7 @@ fun Route.matchmakingController() {
 
                 val job = launch {
                     session.collect {
-                        val view = SessionView(it.id, it.sessionStatus)
+                        val view = SessionView(it.id, SessionStatusView(it.sessionStatus))
                         send(Frame.Text(Json.encodeToString(view)))
                     }
                 }

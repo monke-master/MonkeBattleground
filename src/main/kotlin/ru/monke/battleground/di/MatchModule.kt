@@ -10,5 +10,5 @@ import ru.monke.battleground.domain.session.SessionRepository
 val matchModule = module {
     single<SessionRepository> { SessionRepositoryImpl() }
     single<TeamRepository> { TeamRepositoryImpl() }
-    single { MatchmakingInteractor(get(), get()) }
+    single { MatchmakingInteractor(get(), get(), get(), get()) }
 }

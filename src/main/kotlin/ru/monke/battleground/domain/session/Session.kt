@@ -10,6 +10,10 @@ data class Session(
     val sessionStatus: SessionStatus
 )
 
-enum class SessionStatus {
-    WAITING_FOR_PLAYERS, STARTED
+sealed class SessionStatus {
+    data object WaitingForPlayers: SessionStatus()
+
+    data class Started(
+        val gameId: String
+    ): SessionStatus()
 }
