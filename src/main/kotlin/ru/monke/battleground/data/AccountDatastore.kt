@@ -17,7 +17,8 @@ class AccountDatastore(
                     "password VARCHAR(255) NOT NULL, " +
                     "nickname VARCHAR(255) NOT NULL" +
             ");"
-        private const val SELECT_ACCOUNT_BY_ID = "SELECT * FROM Accounts WHERE email = ?"
+        private const val SELECT_ACCOUNT_BY_EMAIL = "SELECT * FROM Accounts WHERE email = ?"
+        private const val SELECT_ACCOUNT_BY_ID = "SELECT * FROM Accounts WHERE id = ?"
         private const val INSERT_ACCOUNT = "INSERT INTO Accounts (id, email, password, nickname) VALUES (?, ?, ?, ?)"
 
     }
@@ -40,12 +41,34 @@ class AccountDatastore(
 
     suspend fun getAccountWithEmail(email: String): Account? {
         return withContext(Dispatchers.IO) {
-            val statement = connection.prepareStatement(SELECT_ACCOUNT_BY_ID)
+            val statement = connection.prepareStatement(SELECT_ACCOUNT_BY_EMAIL)
             statement.setString(1, email)
             val result = statement.executeQuery()
 
             if (result.next()) {
                 val id = result.getString(1)
+                val password = result.getString(3)
+                val nickname = result.getString(4)
+                return@withContext Account(
+                    id = id,
+                    email = email,
+                    password = password,
+                    nickname = nickname
+                )
+            } else {
+                return@withContext null
+            }
+        }
+    }
+
+    suspend fun getAccountWithId(id: String): Account? {
+        return withContext(Dispatchers.IO) {
+            val statement = connection.prepareStatement(SELECT_ACCOUNT_BY_ID)
+            statement.setString(1, id)
+            val result = statement.executeQuery()
+
+            if (result.next()) {
+                val email = result.getString(2)
                 val password = result.getString(3)
                 val nickname = result.getString(4)
                 return@withContext Account(

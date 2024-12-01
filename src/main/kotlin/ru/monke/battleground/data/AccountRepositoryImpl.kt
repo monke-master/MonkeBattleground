@@ -19,4 +19,10 @@ class AccountRepositoryImpl(
             accountDatastore.getAccountWithEmail(email) ?: throw AccountNotFoundException()
         }
     }
+
+    override suspend fun getAccountById(id: String): Result<Account> {
+        return runCatching {
+            accountDatastore.getAccountWithId(id) ?: throw AccountNotFoundException()
+        }
+    }
 }
