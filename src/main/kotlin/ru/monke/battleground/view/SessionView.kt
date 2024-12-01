@@ -1,7 +1,7 @@
 package ru.monke.battleground.view
 
 import kotlinx.serialization.Serializable
-import ru.monke.battleground.domain.matchmaking.SessionStatus
+import ru.monke.battleground.domain.session.SessionStatus
 
 @Serializable
 data class SessionView(

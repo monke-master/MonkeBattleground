@@ -1,4 +1,6 @@
-package ru.monke.battleground.domain.matchmaking
+package ru.monke.battleground.domain.matchmaking.model
+
+import ru.monke.battleground.domain.session.Session
 
 data class Team(
     val id: String,

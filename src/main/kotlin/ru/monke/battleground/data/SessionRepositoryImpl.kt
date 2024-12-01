@@ -2,7 +2,7 @@ package ru.monke.battleground.data
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import ru.monke.battleground.domain.matchmaking.Session
+import ru.monke.battleground.domain.session.Session
 import ru.monke.battleground.domain.session.SessionRepository
 
 class SessionRepositoryImpl: SessionRepository {

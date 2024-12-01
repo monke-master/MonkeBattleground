@@ -1,4 +1,4 @@
-package example.com
+package ru.monke.battleground.server
 
 import io.ktor.server.application.*
 import io.ktor.server.plugins.swagger.*

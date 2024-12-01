@@ -1,4 +1,4 @@
-package ru.monke.battleground.domain.matchmaking
+package ru.monke.battleground.domain.matchmaking.model
 
 data class Player(
     val id: String,

@@ -1,6 +1,5 @@
 package ru.monke.battleground
 
-import example.com.*
 import io.ktor.server.application.*
 import ru.monke.battleground.server.*
 
@@ -11,7 +10,6 @@ fun main(args: Array<String>) {
 fun Application.module() {
     configureHTTP()
     configureSerialization()
-    configureSockets()
     configureWebSockets()
     configureKoin()
     configureJWT()

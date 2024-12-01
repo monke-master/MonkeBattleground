@@ -1,7 +1,7 @@
 package ru.monke.battleground.data
 
 import ru.monke.battleground.domain.matchmaking.TeamRepository
-import ru.monke.battleground.domain.matchmaking.Team
+import ru.monke.battleground.domain.matchmaking.model.Team
 
 class TeamRepositoryImpl(): TeamRepository {
 

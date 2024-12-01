@@ -8,7 +8,8 @@ class ValidateAccountUseCase(
 ) {
 
     suspend fun execute(accountId: String): Result<Any> {
-        val account = accountRepository.getAccountById(accountId).getOrNull() ?: return Result.failure(AccountNotFoundException())
-        return Result.success(account)
+//        val account = accountRepository.getAccountById(accountId).getOrNull() ?: return Result.failure(AccountNotFoundException())
+//        return Result.success(account)
+        return Result.success(Unit)
     }
 }

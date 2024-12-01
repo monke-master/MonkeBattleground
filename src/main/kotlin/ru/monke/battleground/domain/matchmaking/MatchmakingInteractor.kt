@@ -4,10 +4,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.monke.battleground.domain.session.MAX_PLAYERS
-import ru.monke.battleground.domain.session.MILLIS_TO_START_SESSION
-import ru.monke.battleground.domain.session.MIN_PLAYERS_TO_START
-import ru.monke.battleground.domain.session.SessionRepository
+import ru.monke.battleground.domain.matchmaking.error.FullTeamException
+import ru.monke.battleground.domain.matchmaking.error.TeamNotFoundException
+import ru.monke.battleground.domain.matchmaking.model.*
+import ru.monke.battleground.domain.session.*
 import java.util.*
 
 class MatchmakingInteractor(

@@ -1,4 +1,7 @@
-package ru.monke.battleground.domain.matchmaking
+package ru.monke.battleground.domain.session
+
+import ru.monke.battleground.domain.matchmaking.model.Team
+import ru.monke.battleground.domain.matchmaking.model.TeamSize
 
 data class Session(
     val id: String,
