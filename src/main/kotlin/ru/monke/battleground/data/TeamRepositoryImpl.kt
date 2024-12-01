@@ -1,9 +1,9 @@
 package ru.monke.battleground.data
 
-import ru.monke.battleground.domain.matchmaking.MatchmakingRepository
+import ru.monke.battleground.domain.matchmaking.TeamRepository
 import ru.monke.battleground.domain.matchmaking.Team
 
-class MatchmakingRepositoryImpl(): MatchmakingRepository {
+class TeamRepositoryImpl(): TeamRepository {
 
     private val teamsList = mutableListOf<Team>()
 

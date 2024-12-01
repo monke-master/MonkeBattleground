@@ -1,6 +1,6 @@
 package ru.monke.battleground.domain.matchmaking
 
-interface MatchmakingRepository {
+interface TeamRepository {
 
     suspend fun insertTeam(team: Team)
 
