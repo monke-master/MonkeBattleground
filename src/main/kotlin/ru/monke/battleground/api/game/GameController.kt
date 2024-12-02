@@ -106,6 +106,26 @@ fun Route.gameController() {
                     }
                 }
 
+                route("/shoot") {
+                    post {
+                        val gameId = call.parameters[GAME_ID]
+                            ?: return@post call.respond(HttpStatusCode.BadRequest, null)
+                        val playerId = call.parameters[PLAYER_ID]
+                            ?: return@post call.respond(HttpStatusCode.BadRequest, null)
+
+                        val request = call.receive<ShootPlayerRequest>()
+
+                        gameInteractor.shoot(
+                            gameId = gameId,
+                            playerId = playerId,
+                            targetId = request.targetPlayerId,
+                            weaponId = request.weaponId
+                        ).getOrNull() ?: return@post call.respond(HttpStatusCode.NotFound, null)
+
+                        call.respond(HttpStatusCode.OK, null)
+                    }
+                }
+
 
             }
         }

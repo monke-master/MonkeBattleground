@@ -35,8 +35,8 @@ class GameCreator {
             }
         }
 
-        val weaponTypes = buildList {
-            repeat(PICKABLE_AMMO_COUNT) {
+        val weapons = buildList {
+            repeat(PICKABLE_WEAPONS_COUNT) {
                 val type = randomWeaponType()
                 add(
                     PickableItem(
@@ -55,7 +55,7 @@ class GameCreator {
         }
 
         return GameMap(
-            pickableItems = ammoItems
+            pickableItems = ammoItems + weapons
         )
     }
 

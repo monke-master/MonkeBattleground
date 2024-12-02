@@ -1,9 +1,8 @@
 package ru.monke.battleground.domain.game
 
-import ru.monke.battleground.domain.game.models.Coordinates
-import ru.monke.battleground.domain.game.models.Game
-import ru.monke.battleground.domain.game.models.InventoryItem
+import ru.monke.battleground.domain.game.models.*
 import ru.monke.battleground.domain.session.Session
+import kotlin.math.max
 
 class GameInteractor(
     private val gameRepository: GameRepository,
@@ -70,6 +69,67 @@ class GameInteractor(
             val teams = game.teams.toMutableList()
             teams.remove(team)
             teams.add(team.copy(gamePlayers = players))
+
+            gameRepository.insertGame(game.copy(teams = teams))
+        }
+    }
+
+    suspend fun shoot(
+        gameId: String,
+        playerId: String,
+        weaponId: String,
+        targetId: String
+    ): Result<Any> {
+        return runCatching {
+            val game = getGame(gameId)?.value ?: throw GameNotFoundError()
+            var player = game.getPlayer(playerId) ?: throw EntityNotFoundException()
+            var team = game.teams.find { it.gamePlayers.contains(player) } ?: throw EntityNotFoundException()
+
+            val items = player.inventory.items.toMutableList()
+            var weapon: Weapon = items.find { it.item is Weapon && it.item.id == weaponId }?.item as? Weapon ?: throw EntityNotFoundException()
+
+            if (weapon.clip.currentAmmo == 0) return Result.success(Unit)
+            weapon = weapon.copy(clip = weapon.clip.copy(currentAmmo = weapon.clip.currentAmmo - 1))
+
+            var target = game.getPlayer(targetId) ?: throw EntityNotFoundException()
+            var targetTeam = game.teams.find { it.gamePlayers.contains(target) } ?: throw EntityNotFoundException()
+            if (target.health == 0) return Result.success(Unit)
+
+            target = target.copy(health = max(target.health - weapon.weaponType.damage, 0))
+
+            if (target.health <= 0) {
+                player = player.copy(
+                    statistics = Statistics(
+                        playersKilled = player.statistics.playersKilled + 1,
+                        damage = player.statistics.damage + weapon.weaponType.damage
+                    )
+                )
+            }
+
+            val weaponItem = items.find { it.item.id == weaponId } ?: throw EntityNotFoundException()
+            items.remove(weaponItem)
+            items.add(InventoryItem(weaponItem.x, weaponItem.y, weapon))
+
+            player = player.copy(
+                inventory = player.inventory.copy(items = items)
+            )
+
+            val teamPlayers = team.gamePlayers.toMutableList()
+            teamPlayers.removeAll{ it.id == playerId }
+            teamPlayers.add(player)
+
+            val targetTeamPlayers = targetTeam.gamePlayers.toMutableList()
+            targetTeamPlayers.removeAll { it.id == targetId }
+            targetTeamPlayers.add(target)
+
+            targetTeam = targetTeam.copy(gamePlayers = targetTeamPlayers)
+            team = team.copy(gamePlayers = teamPlayers)
+
+            val teams = game.teams.toMutableList()
+            teams.removeAll { it.id == team.id }
+            teams.removeAll { it.id == targetTeam.id }
+            teams.add(targetTeam)
+            teams.add(team)
 
             gameRepository.insertGame(game.copy(teams = teams))
         }
