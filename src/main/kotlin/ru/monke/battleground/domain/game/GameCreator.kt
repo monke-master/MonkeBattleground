@@ -8,11 +8,11 @@ import java.util.UUID
 
 class GameCreator {
 
-    suspend fun createGame(session: Session): Game {
+    fun createGame(session: Session): Game {
         val game = Game(
             id = UUID.randomUUID().toString(),
             gameMap = generateMap(),
-            deathZone = null,
+            deathZones = emptyList(),
             teams = session.teams.map { it.toGameTeam() }
         )
 
@@ -64,15 +64,6 @@ class GameCreator {
 private fun randomWeaponType(): WeaponType {
     return WeaponType.entries[(0 until WeaponType.entries.size).random()]
 }
-
-private fun randomCoordinates(): Coordinates {
-    return Coordinates(
-        x = X_RANGE.random().toFloat(),
-        y = Y_RANGE.random().toFloat(),
-        z = Z_RANGE.random().toFloat()
-    )
-}
-
 private fun Team.toGameTeam(): GameTeam {
     return GameTeam(
         id = id,

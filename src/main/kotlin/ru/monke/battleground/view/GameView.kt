@@ -7,7 +7,7 @@ data class GameView(
     val id: String,
     val mapView: MapView,
     val teams: List<GameTeamView>,
-    val deathZoneView: DeathZoneView?
+    val deathZoneView: List<DeathZoneView>
 )
 
 @Serializable

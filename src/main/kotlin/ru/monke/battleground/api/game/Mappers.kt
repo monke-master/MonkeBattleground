@@ -1,19 +1,16 @@
 package ru.monke.battleground.api.game
 
 import ru.monke.battleground.domain.game.models.*
-import ru.monke.battleground.domain.matchmaking.model.Player
-import ru.monke.battleground.domain.session.Session
 import ru.monke.battleground.domain.session.SessionStatus
 import ru.monke.battleground.view.*
 import ru.monke.battleground.view.GameView
 import ru.monke.battleground.view.PickableItemView
-import kotlin.math.max
 
 fun GameView(game: Game): GameView {
     return GameView(
         id = game.id,
         mapView = MapView(game.gameMap),
-        deathZoneView = game.deathZone?.let { DeathZoneView(it) },
+        deathZoneView = game.deathZones.map { DeathZoneView(it) },
         teams = game.teams.map { GameTeamView(it) }
     )
 }
@@ -51,7 +48,7 @@ private fun InventoryView(inventory: Inventory): InventoryView {
 private fun DeathZoneView(zone: DeathZone): DeathZoneView {
     return DeathZoneView(
         center = CoordinatesView(zone.center),
-        radius = zone.radius
+        radius = zone.level.radius
     )
 }
 

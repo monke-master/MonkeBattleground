@@ -1,5 +1,8 @@
 package ru.monke.battleground.domain.game
 
+import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import ru.monke.battleground.domain.game.models.*
 import ru.monke.battleground.domain.session.Session
 import kotlin.math.max
@@ -9,10 +12,12 @@ class GameInteractor(
     private val gameCreator: GameCreator
 ) {
 
+    private val mutex = Mutex()
+
     suspend fun createGame(session: Session): String {
         val game = gameCreator.createGame(session)
         gameRepository.insertGame(game)
-        startGame(game)
+        startZoneCycle(game.id)
         return game.id
     }
 
@@ -139,7 +144,54 @@ class GameInteractor(
 
     fun getGame(gameId: String) = gameRepository.games[gameId]
 
-    private suspend fun startGame(game: Game) {
+    private suspend fun startZoneCycle(gameId: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            addZone(gameId)
+            delay(DEATH_ZONE_DELAY_MS)
+            startZoneCycle(gameId)
+        }
 
+    }
+
+    private suspend fun addZone(gameId: String) {
+        CoroutineScope(currentCoroutineContext()).launch {
+            mutex.withLock {
+                val zone = DeathZone(
+                    level = DeathZoneLevel.FIRST,
+                    center = randomCoordinates()
+                )
+                val game = getGame(gameId)?.value ?: return@launch
+                val updatedZones = game.deathZones + zone
+                gameRepository.insertGame(game.copy(deathZones = updatedZones))
+                delay(DEATH_ZONE_DELAY_MS)
+                upgradeZone(gameId, updatedZones.lastIndex)
+            }
+        }
+    }
+
+    private suspend fun upgradeZone(
+        gameId: String,
+        zoneIndex: Int
+    ) {
+        CoroutineScope(currentCoroutineContext()).launch {
+            mutex.withLock {
+                val game = getGame(gameId)?.value ?: return@launch
+                val zone = game.deathZones[zoneIndex]
+
+                if (zone.level == DeathZoneLevel.FIFTH) return@launch
+
+                val zones = game.deathZones.toMutableList()
+
+                zones[zoneIndex] = DeathZone(
+                    center = zone.center,
+                    level = DeathZoneLevel.entries[DeathZoneLevel.entries.indexOf(zone.level) + 1]
+                )
+
+                gameRepository.insertGame(game.copy(deathZones = zones))
+
+                delay(DEATH_ZONE_DELAY_MS)
+                upgradeZone(gameId, zoneIndex)
+            }
+        }
     }
 }

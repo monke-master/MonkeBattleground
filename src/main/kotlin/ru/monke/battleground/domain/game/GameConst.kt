@@ -12,3 +12,5 @@ val Y_RANGE = (-1000..1000)
 val Z_RANGE = (0..100)
 
 val AMMO_COUNT_RANGE = (10..30)
+
+const val DEATH_ZONE_DELAY_MS = 1 * 1000L
