@@ -12,7 +12,6 @@ import ru.monke.battleground.domain.game.GameInteractor
 import ru.monke.battleground.domain.matchmaking.MatchmakingInteractor
 import ru.monke.battleground.domain.matchmaking.model.TeamSize
 import ru.monke.battleground.domain.session.SessionStatus
-import ru.monke.battleground.view.SessionStatusView
 
 fun Route.mockData() {
     runBlocking {
@@ -23,6 +22,8 @@ fun Route.mockData() {
             password = "gspd",
             nickname = "BimboBoy"
         ).getOrThrow()
+
+        println(generateJWT(accountId))
 
         val matchmakingInteractor: MatchmakingInteractor = KoinPlatform.getKoin().get()
 

@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 import org.koin.mp.KoinPlatform
 import ru.monke.battleground.domain.auth.usecase.ValidateAccountUseCase
 import ru.monke.battleground.domain.game.GameInteractor
+import ru.monke.battleground.domain.game.models.Coordinates
 import ru.monke.battleground.server.getAccountId
 import ru.monke.battleground.view.GameView
 
@@ -84,6 +85,25 @@ fun Route.gameController() {
                         call.respond(HttpStatusCode.OK, null)
                     }
 
+                }
+
+                route("/move") {
+                    post {
+                        val gameId = call.parameters[GAME_ID]
+                            ?: return@post call.respond(HttpStatusCode.BadRequest, null)
+                        val playerId = call.parameters[PLAYER_ID]
+                            ?: return@post call.respond(HttpStatusCode.BadRequest, null)
+
+                        val request = call.receive<MovePlayerRequest>()
+
+                        gameInteractor.move(
+                            gameId = gameId,
+                            playerId = playerId,
+                            coordinates = Coordinates(request.x, request.y, request.z)
+                        ).getOrNull() ?: return@post call.respond(HttpStatusCode.NotFound, null)
+
+                        call.respond(HttpStatusCode.OK, null)
+                    }
                 }
 
 

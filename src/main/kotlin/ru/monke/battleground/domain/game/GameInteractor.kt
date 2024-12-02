@@ -1,5 +1,6 @@
 package ru.monke.battleground.domain.game
 
+import ru.monke.battleground.domain.game.models.Coordinates
 import ru.monke.battleground.domain.game.models.Game
 import ru.monke.battleground.domain.game.models.InventoryItem
 import ru.monke.battleground.domain.session.Session
@@ -52,8 +53,29 @@ class GameInteractor(
 
     }
 
-    private fun Game.getPlayer(playerId: String) = teams.flatMap { it.gamePlayers }.find { it.id == playerId }
+    suspend fun move(
+        gameId: String,
+        playerId: String,
+        coordinates: Coordinates
+    ): Result<Any> {
+        return runCatching {
+            val game = getGame(gameId)?.value ?: throw GameNotFoundError()
+            val player = game.getPlayer(playerId) ?: throw EntityNotFoundException()
+            val team = game.teams.find { it.gamePlayers.contains(player) } ?: throw EntityNotFoundException()
 
+            val players = team.gamePlayers.toMutableList()
+            players.remove(player)
+            players.add(player.copy(coordinates = coordinates))
+
+            val teams = game.teams.toMutableList()
+            teams.remove(team)
+            teams.add(team.copy(gamePlayers = players))
+
+            gameRepository.insertGame(game.copy(teams = teams))
+        }
+    }
+
+    private fun Game.getPlayer(playerId: String) = teams.flatMap { it.gamePlayers }.find { it.id == playerId }
 
     fun getGame(gameId: String) = gameRepository.games[gameId]
 
