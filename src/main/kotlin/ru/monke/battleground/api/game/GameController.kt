@@ -3,6 +3,7 @@ package ru.monke.battleground.api.game
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
+import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -24,9 +25,9 @@ fun Route.gameController() {
     val gameInteractor: GameInteractor = KoinPlatform.getKoin().get()
     val validateAccountUseCase: ValidateAccountUseCase = KoinPlatform.getKoin().get()
 
-    route("/game") {
+    route("/game/{$GAME_ID}") {
         authenticate {
-            webSocket("/ongoing_game/{$GAME_ID}") {
+            webSocket("/ongoing_game") {
                 val principal = call.principal<JWTPrincipal>()
                     ?: return@webSocket call.respond(HttpStatusCode.Unauthorized, null)
                 val accountId = principal.payload.getAccountId()
@@ -57,13 +58,36 @@ fun Route.gameController() {
                 }
             }
 
-//            webSocket("/$PLAYER_ID") {
-//                val principal = call.principal<JWTPrincipal>()
-//                    ?: return@webSocket call.respond(HttpStatusCode.Unauthorized, null)
-//                val accountId = principal.payload.getAccountId()
-//                validateAccountUseCase.execute(accountId).getOrNull()
-//                    ?: return@webSocket call.respond(HttpStatusCode.Unauthorized, null)
-//            }
+            route("/{$PLAYER_ID}") {
+                route("/pick_item") {
+                    post {
+//                        val principal = call.principal<JWTPrincipal>()
+//                            ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
+//                        val accountId = principal.payload.getAccountId()
+//                        validateAccountUseCase.execute(accountId).getOrNull()
+//                            ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
+
+                        val gameId = call.parameters[GAME_ID]
+                            ?: return@post call.respond(HttpStatusCode.BadRequest, null)
+                        val playerId = call.parameters[PLAYER_ID]
+                            ?: return@post call.respond(HttpStatusCode.BadRequest, null)
+
+                        val request = call.receive<PickItemRequest>()
+                        gameInteractor.pickItem(
+                            playerId = playerId,
+                            gameId = gameId,
+                            inventoryX = request.inventoryX,
+                            inventoryY = request.inventoryY,
+                            itemId = request.itemId
+                        ).getOrNull() ?: return@post call.respond(HttpStatusCode.NotFound, null)
+
+                        call.respond(HttpStatusCode.OK, null)
+                    }
+
+                }
+
+
+            }
         }
     }
 }

@@ -3,8 +3,8 @@ package ru.monke.battleground.domain.game
 const val MAX_HEALTH = 100
 const val INVENTORY_SIZE = 10
 
-const val PICKABLE_AMMO_COUNT = 200
-const val PICKABLE_WEAPONS_COUNT = 50
+const val PICKABLE_AMMO_COUNT = 1
+const val PICKABLE_WEAPONS_COUNT = 1
 
 
 val X_RANGE = (-1000..1000)

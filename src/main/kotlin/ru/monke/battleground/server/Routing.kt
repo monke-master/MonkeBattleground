@@ -8,6 +8,7 @@ import ru.monke.battleground.api.match.matchmakingController
 
 fun Application.configureRouting() {
     routing {
+        mockData()
         authController()
         matchmakingController()
         gameController()
