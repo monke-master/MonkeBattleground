@@ -55,6 +55,7 @@ fun Route.mockData() {
                     CoroutineScope(Dispatchers.Default).launch {
                         gameInteractor.getGame(status.gameId)?.collect { game ->
                             println("Game: ${game}")
+                            println("death zlones: ${game.deathZones.size}")
 
                             val weapon = game.gameMap.pickableItems.find { it.item is Weapon }
                             val player1 = game.teams[0].gamePlayers[0]

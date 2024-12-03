@@ -147,22 +147,25 @@ class GameInteractor(
     private suspend fun startZoneCycle(gameId: String) {
         CoroutineScope(Dispatchers.Default).launch {
             addZone(gameId)
-            delay(DEATH_ZONE_DELAY_MS)
-            startZoneCycle(gameId)
-        }
+            val game = getGame(gameId)?.value ?: throw GameNotFoundError()
 
+            if (game.deathZones.size < MAX_ZONE_COUNT) {
+                delay(DEATH_ZONE_DELAY_MS)
+                startZoneCycle(gameId)
+            }
+        }
     }
 
     private suspend fun addZone(gameId: String) {
-        CoroutineScope(currentCoroutineContext()).launch {
-            mutex.withLock {
-                val zone = DeathZone(
-                    level = DeathZoneLevel.FIRST,
-                    center = randomCoordinates()
-                )
-                val game = getGame(gameId)?.value ?: return@launch
-                val updatedZones = game.deathZones + zone
-                gameRepository.insertGame(game.copy(deathZones = updatedZones))
+        mutex.withLock {
+            val zone = DeathZone(
+                level = DeathZoneLevel.FIRST,
+                center = randomCoordinates()
+            )
+            val game = getGame(gameId)?.value ?: return@withLock
+            val updatedZones = game.deathZones + zone
+            gameRepository.insertGame(game.copy(deathZones = updatedZones))
+            CoroutineScope(currentCoroutineContext()).launch {
                 delay(DEATH_ZONE_DELAY_MS)
                 upgradeZone(gameId, updatedZones.lastIndex)
             }
@@ -173,25 +176,26 @@ class GameInteractor(
         gameId: String,
         zoneIndex: Int
     ) {
-        CoroutineScope(currentCoroutineContext()).launch {
-            mutex.withLock {
-                val game = getGame(gameId)?.value ?: return@launch
-                val zone = game.deathZones[zoneIndex]
+        mutex.withLock {
+            val game = getGame(gameId)?.value ?: return
+            val zone = game.deathZones[zoneIndex]
 
-                if (zone.level == DeathZoneLevel.FIFTH) return@launch
+            if (zone.level == DeathZoneLevel.FIFTH) return
 
-                val zones = game.deathZones.toMutableList()
+            val zones = game.deathZones.toMutableList()
 
-                zones[zoneIndex] = DeathZone(
-                    center = zone.center,
-                    level = DeathZoneLevel.entries[DeathZoneLevel.entries.indexOf(zone.level) + 1]
-                )
+            zones[zoneIndex] = DeathZone(
+                center = zone.center,
+                level = DeathZoneLevel.entries[DeathZoneLevel.entries.indexOf(zone.level) + 1]
+            )
 
-                gameRepository.insertGame(game.copy(deathZones = zones))
+            gameRepository.insertGame(game.copy(deathZones = zones))
 
+            CoroutineScope(currentCoroutineContext()).launch {
                 delay(DEATH_ZONE_DELAY_MS)
                 upgradeZone(gameId, zoneIndex)
             }
         }
+
     }
 }

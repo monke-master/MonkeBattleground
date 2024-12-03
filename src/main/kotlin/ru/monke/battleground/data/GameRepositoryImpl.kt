@@ -9,7 +9,6 @@ class GameRepositoryImpl: GameRepository {
 
     override val games = HashMap<String, MutableStateFlow<Game>>()
 
-
     override suspend fun insertGame(game: Game) {
         games.getOrPut(game.id) { MutableStateFlow(game) }
             .update { game }
