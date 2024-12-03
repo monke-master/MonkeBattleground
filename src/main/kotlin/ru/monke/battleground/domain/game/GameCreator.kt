@@ -13,7 +13,8 @@ class GameCreator {
             id = UUID.randomUUID().toString(),
             gameMap = generateMap(),
             deathZones = emptyList(),
-            teams = session.teams.map { it.toGameTeam() }
+            teams = session.teams.map { it.toGameTeam() },
+            gameStatus = GameStatus.Ongoing
         )
 
         return game

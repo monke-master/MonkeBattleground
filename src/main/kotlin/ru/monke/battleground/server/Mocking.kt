@@ -69,17 +69,17 @@ fun Route.mockData() {
                                     inventoryX = 1
                                 )
                             }
-//
-//                            if (player2.inventory.items.isNotEmpty()) {
-//                                val picked = player2.inventory.items[0].item as Weapon
-//
-//                                gameInteractor.shoot(
-//                                    gameId = game.id,
-//                                    playerId = player2.id,
-//                                    weaponId = picked.id,
-//                                    targetId = player1.id
-//                                )
-//                            }
+
+                            if (player2.inventory.items.isNotEmpty()) {
+                                val picked = player2.inventory.items[0].item as Weapon
+
+                                gameInteractor.shoot(
+                                    gameId = game.id,
+                                    playerId = player2.id,
+                                    weaponId = picked.id,
+                                    targetId = player1.id
+                                )
+                            }
                         }
                     }
                 }

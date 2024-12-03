@@ -11,8 +11,16 @@ fun GameView(game: Game): GameView {
         id = game.id,
         mapView = MapView(game.gameMap),
         deathZoneView = game.deathZones.map { DeathZoneView(it) },
-        teams = game.teams.map { GameTeamView(it) }
+        teams = game.teams.map { GameTeamView(it) },
+        status = GameStatusView(game.gameStatus)
     )
+}
+
+fun GameStatusView(gameStatus: GameStatus): GameStatusView {
+    return when (gameStatus) {
+        is GameStatus.End -> GameStatusView.End(gameStatus.winnerTeamId)
+        GameStatus.Ongoing -> GameStatusView.Ongoing
+    }
 }
 
 private fun GameTeamView(team: GameTeam): GameTeamView {

@@ -17,7 +17,7 @@ class GameInteractor(
     suspend fun createGame(session: Session): String {
         val game = gameCreator.createGame(session)
         gameRepository.insertGame(game)
-        startZoneCycle(game.id)
+        startGame(game.id)
         return game.id
     }
 
@@ -143,6 +143,25 @@ class GameInteractor(
     private fun Game.getPlayer(playerId: String) = teams.flatMap { it.gamePlayers }.find { it.id == playerId }
 
     fun getGame(gameId: String) = gameRepository.games[gameId]
+
+    private suspend fun startGame(gameId: String) {
+        startZoneCycle(gameId)
+        CoroutineScope(currentCoroutineContext()).launch {
+            getGame(gameId)?.collect { game ->
+                val deadTeams = game.getDeadTeams()
+
+                if (game.teams.size - 1 == deadTeams) {
+                    game.getWinner()?.let {
+                        gameRepository.insertGame(game.copy(gameStatus = GameStatus.End(it.id)))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun Game.getWinner() = teams.find { !it.gamePlayers.all { it.health <= 0 } }
+
+    private fun Game.getDeadTeams(): Int = teams.count { it.gamePlayers.all { it.health <= 0 } }
 
     private suspend fun startZoneCycle(gameId: String) {
         CoroutineScope(Dispatchers.Default).launch {
