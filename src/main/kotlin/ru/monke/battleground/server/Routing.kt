@@ -32,7 +32,7 @@ fun Application.configureRouting() {
                 description = "Development Server"
             }
         }
-        mockData()
+        // mockData()
         authController()
         matchmakingController()
         gameController()

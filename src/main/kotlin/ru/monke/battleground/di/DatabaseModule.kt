@@ -6,7 +6,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 fun Application.databaseModule() = module {
-    single<Connection> { connectToPostgres(true)  }
+    single<Connection> { connectToPostgres(false)  }
 }
 
 
@@ -15,9 +15,9 @@ private fun Application.connectToPostgres(embedded: Boolean): Connection {
     if (embedded) {
         return DriverManager.getConnection("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "root", "")
     } else {
-        val url = environment.config.property("postgres.url").getString()
-        val user = environment.config.property("postgres.user").getString()
-        val password = environment.config.property("postgres.password").getString()
+        val url = "jdbc:postgresql://db:5432/gamedb"
+        val user = "admin"
+        val password = "admin"
 
         return DriverManager.getConnection(url, user, password)
     }

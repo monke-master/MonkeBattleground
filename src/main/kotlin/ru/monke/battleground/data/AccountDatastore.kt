@@ -12,7 +12,7 @@ class AccountDatastore(
     companion object {
         private const val CREATE_TABLE_ACCOUNTS =
             "CREATE TABLE IF NOT EXISTS Accounts (" +
-                    "id UUID PRIMARY KEY, " +
+                    "id VARCHAR(255) PRIMARY KEY, " +
                     "email VARCHAR(255) NOT NULL, " +
                     "password VARCHAR(255) NOT NULL, " +
                     "nickname VARCHAR(255) NOT NULL" +
