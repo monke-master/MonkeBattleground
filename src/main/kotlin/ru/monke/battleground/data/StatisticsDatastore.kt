@@ -34,7 +34,8 @@ class StatisticsDatastore(
             statement.setBoolean(1, statistics.isWinner)
             statement.setFloat(2, statistics.damage)
             statement.setInt(3, statistics.playersKilled)
-            statement.setString(4, statistics.accountId)
+            statement.setString(4, statistics.gameId)
+            statement.setString(5, statistics.accountId)
             statement.executeUpdate()
         }
     }

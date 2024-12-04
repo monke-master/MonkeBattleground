@@ -148,9 +148,10 @@ class GameInteractor(
     fun getGame(gameId: String) = gameRepository.games[gameId]
 
     private suspend fun startGame(gameId: String) {
-        startZoneCycle(gameId)
+       //  startZoneCycle(gameId)
         CoroutineScope(currentCoroutineContext()).launch {
             getGame(gameId)?.collect { game ->
+                if (game.gameStatus is GameStatus.End) return@collect
                 val deadTeams = game.getDeadTeams()
 
                 if (game.teams.size - 1 == deadTeams) {

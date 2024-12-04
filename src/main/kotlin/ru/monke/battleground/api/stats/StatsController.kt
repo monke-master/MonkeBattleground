@@ -2,12 +2,12 @@ package ru.monke.battleground.api.stats
 
 import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.mp.KoinPlatform
 import ru.monke.battleground.domain.stats.GetStatisticsUseCase
-
-private const val ACCOUNT_ID = "account_id"
+import ru.monke.battleground.server.getAccountId
 
 fun Route.statisticsController() {
 
@@ -15,10 +15,11 @@ fun Route.statisticsController() {
 
     authenticate {
         route("/statistics") {
-            route("/{$ACCOUNT_ID}") {
+            route("/for_user") {
                 get {
-                    val accountId = call.parameters[ACCOUNT_ID]
-                        ?: return@get call.respond(HttpStatusCode.BadRequest, null)
+                    val principal = call.principal<JWTPrincipal>()
+                        ?: return@get call.respond(HttpStatusCode.Unauthorized, null)
+                    val accountId = principal.payload.getAccountId()
 
                     getStatsUseCase.execute(accountId)
                         .onSuccess { stats ->

@@ -23,6 +23,7 @@ application {
 
 repositories {
     mavenCentral()
+    maven(url = "https://jitpack.io")
 }
 
 dependencies {
@@ -43,6 +44,8 @@ dependencies {
     implementation("io.ktor:ktor-server-config-yaml-jvm")
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+
+    implementation("io.github.smiley4:ktor-swagger-ui:4.1.0")
 }
 
 tasks.test {

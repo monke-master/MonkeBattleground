@@ -9,6 +9,7 @@ class StatisticsRepositoryImpl(
 
     override suspend fun insertStatistics(playerStatistics: PlayerStatistics): Result<Any> {
         return runCatching {
+            println("Stats inserted: $playerStatistics")
             statisticsDatastore.insertStatistics(playerStatistics)
         }
     }

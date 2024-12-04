@@ -25,18 +25,19 @@ fun Route.mockData() {
             nickname = "BimboBoy"
         ).getOrThrow()
 
-        signUpUseCase.execute(
+        val accountId2 = signUpUseCase.execute(
             email = "Buldiga",
             password = "Fascia",
             nickname = "Dzerzh"
         ).getOrThrow()
 
+        println(accountId)
         println(generateJWT(accountId))
 
         val matchmakingInteractor: MatchmakingInteractor = KoinPlatform.getKoin().get()
 
         val teamCode = matchmakingInteractor.connect(accountId, TeamSize.Solo)
-        val teamCode2 = matchmakingInteractor.connect(accountId, TeamSize.Solo)
+        val teamCode2 = matchmakingInteractor.connect(accountId2, TeamSize.Solo)
         matchmakingInteractor.setTeamReady(teamCode)
         matchmakingInteractor.setTeamReady(teamCode2)
 
