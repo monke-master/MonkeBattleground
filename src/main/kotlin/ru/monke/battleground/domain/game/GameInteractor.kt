@@ -5,11 +5,14 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import ru.monke.battleground.domain.game.models.*
 import ru.monke.battleground.domain.session.Session
+import ru.monke.battleground.domain.stats.PlayerStatistics
+import ru.monke.battleground.domain.stats.StatisticsRepository
 import kotlin.math.max
 
 class GameInteractor(
     private val gameRepository: GameRepository,
-    private val gameCreator: GameCreator
+    private val gameCreator: GameCreator,
+    private val statisticsRepository: StatisticsRepository
 ) {
 
     private val mutex = Mutex()
@@ -151,11 +154,29 @@ class GameInteractor(
                 val deadTeams = game.getDeadTeams()
 
                 if (game.teams.size - 1 == deadTeams) {
-                    game.getWinner()?.let {
-                        gameRepository.insertGame(game.copy(gameStatus = GameStatus.End(it.id)))
+                    game.getWinner()?.let { winner ->
+                        gameRepository.insertGame(game.copy(gameStatus = GameStatus.End(winner.id)))
+                        saveStatistics(game, winner)
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun saveStatistics(
+        game: Game,
+        winnerTeam: GameTeam
+    ) {
+        game.teams.flatMap { it.gamePlayers }.forEach { player ->
+            val statistics = PlayerStatistics(
+                gameId = game.id,
+                isWinner = player in winnerTeam.gamePlayers,
+                accountId = player.account.id,
+                damage = player.statistics.damage,
+                playersKilled = player.statistics.playersKilled
+            )
+
+            statisticsRepository.insertStatistics(statistics)
         }
     }
 

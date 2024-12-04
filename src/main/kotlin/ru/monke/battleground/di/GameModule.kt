@@ -9,5 +9,5 @@ import ru.monke.battleground.domain.game.GameRepository
 val gameModule = module {
     single<GameRepository> { GameRepositoryImpl() }
     single { GameCreator() }
-    single { GameInteractor(get(), get()) }
+    single { GameInteractor(get(), get(), get()) }
 }
