@@ -11,7 +11,7 @@ class AccountDatastore(
 
     companion object {
         private const val CREATE_TABLE_ACCOUNTS =
-            "CREATE TABLE Accounts (" +
+            "CREATE TABLE IF NOT EXISTS Accounts (" +
                     "id UUID PRIMARY KEY, " +
                     "email VARCHAR(255) NOT NULL, " +
                     "password VARCHAR(255) NOT NULL, " +
@@ -20,7 +20,7 @@ class AccountDatastore(
         private const val SELECT_ACCOUNT_BY_EMAIL = "SELECT * FROM Accounts WHERE email = ?"
         private const val SELECT_ACCOUNT_BY_ID = "SELECT * FROM Accounts WHERE id = ?"
         private const val INSERT_ACCOUNT = "INSERT INTO Accounts (id, email, password, nickname) VALUES (?, ?, ?, ?)"
-
+        private const val DELETE_ACCOUNT = "DELETE FROM Accounts WHERE id = ?"
     }
 
     init {
@@ -80,6 +80,15 @@ class AccountDatastore(
             } else {
                 return@withContext null
             }
+        }
+    }
+
+    suspend fun deleteAccount(id: String) {
+        withContext(Dispatchers.IO) {
+            val statement = connection.prepareStatement(DELETE_ACCOUNT)
+            statement.setString(1, id)
+            statement.executeUpdate()
+
         }
     }
 }

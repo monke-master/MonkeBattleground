@@ -1,9 +1,6 @@
 package ru.monke.battleground.domain.matchmaking
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import ru.monke.battleground.domain.auth.AccountRepository
 import ru.monke.battleground.domain.auth.error.AccountNotFoundException
 import ru.monke.battleground.domain.auth.model.Account
@@ -122,7 +119,7 @@ class MatchmakingInteractor(
         if (startingSessions.contains(session.id)) return
         startingSessions.add(session.id)
 
-        CoroutineScope(currentCoroutineContext()).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             delay(MILLIS_TO_START_SESSION)
             val gameId = gameInteractor.createGame(session)
             sessionRepository.insertSession(session.copy(sessionStatus = SessionStatus.Started(gameId)))

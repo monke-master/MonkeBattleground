@@ -20,8 +20,10 @@ data class DeathZoneView(
 @Serializable
 sealed class GameStatusView {
 
+    @Serializable
     data object Ongoing: GameStatusView()
 
+    @Serializable
     data class End(
         val winnerTeamId: String
     ): GameStatusView()

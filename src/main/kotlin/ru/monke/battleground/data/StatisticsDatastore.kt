@@ -11,7 +11,7 @@ class StatisticsDatastore(
 
     companion object {
         private const val CREATE_TABLE_STATISTICS =
-            "CREATE TABLE Statistics (" +
+            "CREATE TABLE IF NOT EXISTS Statistics (" +
                     "id Serial PRIMARY KEY, " +
                     "is_winner BOOLEAN NOT NULL, " +
                     "damage REAL NOT NULL, " +

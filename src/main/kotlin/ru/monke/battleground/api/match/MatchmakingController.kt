@@ -95,8 +95,6 @@ fun Route.matchmakingController() {
                     CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Session ID is missing")
                 )
 
-                send(Frame.Text("Connected"))
-
                 val session = interactor.getSession(sessionId) ?: return@webSocket close(
                     CloseReason(CloseReason.Codes.VIOLATED_POLICY, "Session not found")
                 )

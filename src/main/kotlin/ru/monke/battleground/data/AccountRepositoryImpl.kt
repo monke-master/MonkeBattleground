@@ -25,4 +25,10 @@ class AccountRepositoryImpl(
             accountDatastore.getAccountWithId(id) ?: throw AccountNotFoundException()
         }
     }
+
+    override suspend fun deleteAccount(id: String): Result<Any> {
+        return runCatching {
+            accountDatastore.deleteAccount(id)
+        }
+    }
 }

@@ -44,3 +44,11 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host-jvm")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 }
+
+tasks.test {
+    testLogging {
+        events("passed", "failed", "skipped") // Log passed, failed, and skipped tests
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL // Show full stack traces
+        showStandardStreams = true // Include standard output in logs
+    }
+}

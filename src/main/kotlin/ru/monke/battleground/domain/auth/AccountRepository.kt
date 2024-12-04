@@ -9,4 +9,6 @@ interface AccountRepository {
     suspend fun getAccountByEmail(email: String): Result<Account>
 
     suspend fun getAccountById(id: String): Result<Account?>
+
+    suspend fun deleteAccount(id: String): Result<Any>
 }
