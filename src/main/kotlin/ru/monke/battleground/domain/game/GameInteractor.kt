@@ -16,6 +16,7 @@ class GameInteractor(
 ) {
 
     private val mutex = Mutex()
+    private val scopes = HashMap<String, CoroutineScope>()
 
     suspend fun createGame(session: Session): String {
         val game = gameCreator.createGame(session)
@@ -148,8 +149,10 @@ class GameInteractor(
     fun getGame(gameId: String) = gameRepository.games[gameId]
 
     private suspend fun startGame(gameId: String) {
-       //  startZoneCycle(gameId)
-        CoroutineScope(currentCoroutineContext()).launch {
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        scopes[gameId] = scope
+        startZoneCycle(gameId)
+        scope.launch {
             getGame(gameId)?.collect { game ->
                 if (game.gameStatus is GameStatus.End) return@collect
                 val deadTeams = game.getDeadTeams()
@@ -158,6 +161,7 @@ class GameInteractor(
                     game.getWinner()?.let { winner ->
                         gameRepository.insertGame(game.copy(gameStatus = GameStatus.End(winner.id)))
                         saveStatistics(game, winner)
+                        scope.coroutineContext.cancelChildren()
                     }
                 }
             }
@@ -186,7 +190,7 @@ class GameInteractor(
     private fun Game.getDeadTeams(): Int = teams.count { it.gamePlayers.all { it.health <= 0 } }
 
     private suspend fun startZoneCycle(gameId: String) {
-        CoroutineScope(Dispatchers.Default).launch {
+        scopes[gameId]?.launch {
             addZone(gameId)
             val game = getGame(gameId)?.value ?: throw GameNotFoundError()
 
@@ -206,7 +210,7 @@ class GameInteractor(
             val game = getGame(gameId)?.value ?: return@withLock
             val updatedZones = game.deathZones + zone
             gameRepository.insertGame(game.copy(deathZones = updatedZones))
-            CoroutineScope(currentCoroutineContext()).launch {
+            scopes[gameId]?.launch {
                 delay(DEATH_ZONE_DELAY_MS)
                 upgradeZone(gameId, updatedZones.lastIndex)
             }
@@ -232,7 +236,7 @@ class GameInteractor(
 
             gameRepository.insertGame(game.copy(deathZones = zones))
 
-            CoroutineScope(currentCoroutineContext()).launch {
+            scopes[gameId]?.launch {
                 delay(DEATH_ZONE_DELAY_MS)
                 upgradeZone(gameId, zoneIndex)
             }

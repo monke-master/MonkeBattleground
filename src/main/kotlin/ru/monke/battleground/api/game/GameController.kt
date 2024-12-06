@@ -62,11 +62,11 @@ fun Route.gameController() {
             route("/{$PLAYER_ID}") {
                 route("/pick_item") {
                     post {
-//                        val principal = call.principal<JWTPrincipal>()
-//                            ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
-//                        val accountId = principal.payload.getAccountId()
-//                        validateAccountUseCase.execute(accountId).getOrNull()
-//                            ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
+                        val principal = call.principal<JWTPrincipal>()
+                            ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
+                        val accountId = principal.payload.getAccountId()
+                        validateAccountUseCase.execute(accountId).getOrNull()
+                            ?: return@post call.respond(HttpStatusCode.Unauthorized, null)
 
                         val gameId = call.parameters[GAME_ID]
                             ?: return@post call.respond(HttpStatusCode.BadRequest, null)

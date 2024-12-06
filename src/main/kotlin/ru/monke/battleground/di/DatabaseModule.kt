@@ -6,7 +6,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 
 fun Application.databaseModule() = module {
-    single<Connection> { connectToPostgres(false)  }
+    single<Connection> { connectToPostgres(true)  }
 }
 
 
